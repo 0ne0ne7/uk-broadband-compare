@@ -1,0 +1,21 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# App caches
+.streamlit/
+
+# Playwright artifacts & logs
+logs/
+videos/
+**/*.har
+**/*trace*.zip
+**/*.webm
+console-*.log
+network-*.har
+trace-*.zip
+
+# OS cruft
+.DS_Store
+Thumbs.db
