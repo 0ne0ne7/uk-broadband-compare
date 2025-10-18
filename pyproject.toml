@@ -5,24 +5,8 @@ build-backend = "hatchling.build"
 [project]
 name = "uk-broadband-compare"
 version = "0.1.0"
-description = "Switch Smarter: UK Broadband Price & Speed Tool — Streamlit app with Playwright scrapers"
-readme = "README.md"
+description = "Switch Smarter: UK Broadband Price & Speed Tool"
 requires-python = ">=3.11,<3.12"
-license = { text = "MIT" }
-authors = [
-  { name = "Your Name", email = "you@example.com" }
-]
-keywords = ["streamlit", "playwright", "broadband", "scraping", "uk", "comparison"]
-classifiers = [
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.11",
-  "License :: OSI Approved :: MIT License",
-  "Operating System :: OS Independent",
-  "Topic :: Internet :: WWW/HTTP",
-  "Topic :: Utilities"
-]
-
-# --- Runtime dependencies (pin to versions that work on Cloud + locally) ---
 dependencies = [
   "streamlit==1.38.0",
   "playwright==1.46.0",
@@ -34,53 +18,19 @@ dependencies = [
   "altair==5.3.0",
   "tenacity==8.2.3",
   "httpx==0.27.2",
-  "loguru==0.7.2",
-  "tqdm==4.66.4"
+  "greenlet>=3.1.1",   # avoid 3.13 build issues if ever used
 ]
 
-[project.urls]
-Homepage = "https://github.com/your-user/uk-broadband-compare"
-Issues = "https://github.com/your-user/uk-broadband-compare/issues"
+# Tell hatch which top-level dirs are code packages
+[tool.hatch.build.targets.wheel]
+packages = ["scrapers", "utils", "ui"]
 
-[project.optional-dependencies]
-# Install with: uv pip install .[dev]  (or uv add -g dev <pkg>)
-dev = [
-  "ruff==0.6.8",
-  "black==24.8.0",
-  "pytest==8.3.2",
-  "ipython==8.26.0",
-  "types-requests==2.32.0.20240914"
+[tool.hatch.build.targets.sdist]
+include = [
+  "scrapers/**",
+  "utils/**",
+  "ui/**",
+  "app.py",
+  "data/**",
+  "README.md",
 ]
-
-# ---------- uv configuration ----------
-[tool.uv]
-# Ask uv to manage/download Python for you if needed
-python-preference = "managed"
-default-python = "3.11"
-
-# Handy scripts you can run with `uv run <name>`
-[tool.uv.scripts]
-app = "streamlit run app.py"
-playwright-install = "python -m playwright install chromium"
-format = "black . && ruff check . --fix"
-tests = "pytest -q"
-
-# ---------- Linters & formatters ----------
-[tool.ruff]
-target-version = "py311"
-line-length = 100
-extend-exclude = ["logs", "videos", ".venv"]
-lint.select = ["E","F","I","UP","B","SIM"]
-lint.ignore = ["E203","E501"]  # let Black handle line length; slice colon spacing
-
-[tool.black]
-line-length = 100
-target-version = ["py311"]
-exclude = '''
-/(
-  \.venv
- |\.git
- |logs
- |videos
-)/
-'''
