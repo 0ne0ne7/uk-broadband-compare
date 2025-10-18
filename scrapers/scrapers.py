@@ -941,10 +941,16 @@ async def scrape_many(
             browser: Optional[Browser] = None
             try:
                 browser = await engine.launch(
-                    headless=not headed,
-                    slow_mo=slow_mo_ms or 0,
-                    devtools=devtools
-                )
+                                headless=True,
+                                args=[
+                                    "--no-sandbox",
+                                    "--disable-setuid-sandbox",
+                                    "--disable-dev-shm-usage",
+                                    "--disable-gpu",
+                                    "--no-zygote",
+                                    "--single-process",
+                                ],
+                            )
 
                 context_kwargs = {
                     "viewport": {"width": 1366, "height": 900},
