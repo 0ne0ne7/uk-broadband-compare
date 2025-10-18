@@ -1,21 +1,46 @@
-# --- Streamlit Cloud bootstrap for Playwright ---
-import os, subprocess, sys
+# --- Playwright bootstrap (portable + Cloud-safe) ---
+import os, sys, subprocess
+from pathlib import Path
 
-def _ensure_playwright_browser():
-    # On Streamlit Cloud, apt libs come from packages.txt; just install Chromium binary.
-    # Keep it NO-OP locally.
-    if os.environ.get("STREAMLIT_RUNTIME", "0") == "1" or os.environ.get("STREAMLIT_SERVER_ENABLED"):
-        try:
-            subprocess.run(
-                [sys.executable, "-m", "playwright", "install", "chromium"],
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-        except Exception:
-            pass
+# Use a writable cache; works locally and on Streamlit Cloud
+os.environ.setdefault("XDG_CACHE_HOME", str(Path.home() / ".cache"))
+os.environ.setdefault("PLAYWRIGHT_BROWSERS_PATH", str(Path.home() / ".cache" / "ms-playwright"))
 
-_ensure_playwright_browser()
+def _chrome_exists(cache: Path) -> bool:
+    patterns = [
+        "**/chrome-linux/chrome",
+        "**/chrome-win/chrome.exe",
+        "**/chrome-mac/Chromium.app/Contents/MacOS/Chromium",
+    ]
+    for pat in patterns:
+        if any(cache.glob(pat)):
+            return True
+    return False
+
+def ensure_playwright_chromium():
+    cache = Path(os.environ["PLAYWRIGHT_BROWSERS_PATH"])
+    cache.mkdir(parents=True, exist_ok=True)
+
+    if _chrome_exists(cache):
+        return  # already installed
+
+    # Install only Chromium; DO NOT use --with-deps on Streamlit Cloud
+    try:
+        subprocess.run(
+            [sys.executable, "-m", "playwright", "install", "chromium"],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            env={**os.environ},
+        )
+    except subprocess.CalledProcessError as e:
+        # Don’t crash the app; log and let later code surface a clearer error if needed
+        print("[playwright-install] failed\n", e.stdout or e)
+
+ensure_playwright_chromium()
+# ----------------------------------------------------
+
 
 import asyncio
 import json
