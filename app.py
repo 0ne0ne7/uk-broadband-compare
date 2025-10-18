@@ -1,20 +1,3 @@
-import asyncio
-import json
-import time
-import hashlib
-from typing import Dict, Optional, List
-
-import pandas as pd
-import streamlit as st
-
-from utils.cache import (
-    load_csv_if_exists, append_to_csv, split_cached_and_missing,
-    CSV_FIELDS, providers_from_urls, provider_of
-)
-from utils.theme import load_theme_tokens, apply_theme_css, pick_palette
-from scrapers.scrapers import scrape_many
-from ui.ui import render_charts, render_comparison, render_status_panel
-
 # --- Streamlit Cloud bootstrap for Playwright ---
 import os, subprocess, sys
 
@@ -33,6 +16,23 @@ def _ensure_playwright_browser():
             pass
 
 _ensure_playwright_browser()
+
+import asyncio
+import json
+import time
+import hashlib
+from typing import Dict, Optional, List
+
+import pandas as pd
+import streamlit as st
+
+from utils.cache import (
+    load_csv_if_exists, append_to_csv, split_cached_and_missing,
+    CSV_FIELDS, providers_from_urls, provider_of
+)
+from utils.theme import load_theme_tokens, apply_theme_css, pick_palette
+from scrapers.scrapers import scrape_many
+from ui.ui import render_charts, render_comparison, render_status_panel
 # ------------------------------------------------
 
 
